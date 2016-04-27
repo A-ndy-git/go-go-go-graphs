@@ -30,14 +30,25 @@ import(
 20                  prev[v] ← u 
 21
 22      return dist[], prev[]
+
+Now we can read the shortest path from source to target by reverse iteration:
+
+1  S ← empty sequence
+2  u ← target
+3  while prev[u] is defined:                  // Construct the shortest path with a stack S
+4      insert u at the beginning of S         // Push the vertex onto the stack
+5      u ← prev[u]                            // Traverse from target to source
+6  insert u at the beginning of S             // Push the source onto the stack
+
+
 */
 
-
-func (graph *Graph) Dijkstra(source string, target string)(map[string]int,map[string]*Node){
+//func (graph *Graph) Dijkstra(source string, target string)(dist map[string]int,prev map[string]*Node){
+func (graph *Graph) Dijkstra(source string, target string)(dist map[string]int,path []string){
     
       //Unvisted
       Q := make(map[string]*Node)
-      dist := make(map[string]int)
+      dist = make(map[string]int)
       prev := make(map[string]*Node)
       
       for key , val := range graph.Nodes {             // Initialization
@@ -49,11 +60,10 @@ func (graph *Graph) Dijkstra(source string, target string)(map[string]int,map[st
       dist[source] = 0                        // Distance from source to source
       
       for(len(Q) != 0){
-          u ,keyy := min(Q,dist)    // Source node will be selected first
-          
-      
+          u ,keyy := min(Q,dist)    // Source node will be selected first    
+          delete(Q,keyy) //remove u from Q 
           //for each neighbor v of u: 
-          for key, value := range Q[keyy].Edges{          // where v is still in Q.
+          for key, value := range u.Edges{          // where v is still in Q.
           
               alt := dist[keyy] + value
               if alt < dist[key]{               // A shorter path to v has been found
@@ -61,15 +71,48 @@ func (graph *Graph) Dijkstra(source string, target string)(map[string]int,map[st
                   prev[key] = u 
               }
           }
-          delete(Q,keyy) //remove u from Q 
+          
       }
-      return dist, prev
+      
+      
+      /*
+1  S ← empty sequence
+2  u ← target
+3  while prev[u] is defined:                  // Construct the shortest path with a stack S
+4      insert u at the beginning of S         // Push the vertex onto the stack
+5      u ← prev[u]                            // Traverse from target to source
+6  insert u at the beginning of S             // Push the source onto the stack
+
+
+*/
+      
+        var S []string
+        u := target
+        // Construct the shortest path with a stack S
+        for(prev[u] != nil){
+            // Push the vertex onto the stack
+            S = append([]string{u},S...)
+            u = graph.getKey(prev[u])                            // Traverse from target to source
+        }
+        
+      return dist, S
     
     
     
 }
 
 //u := *Node in Q with min dist[u] 
+
+func (graph *Graph) getKey(node *Node) (key string) {
+    for key ,val := range graph.Nodes{
+        if(val == node){
+            return key
+        }
+    }
+    
+    return "ERROR"
+}
+
 func min(Q map[string]*Node,dist map[string]int) (*Node,string) {
     
     var min int
@@ -165,7 +208,7 @@ func main()  {
     graph1.addUndirectedWeightedVertice("D","E",9)
    
     
-    weight, prev := graph1.Dijkstra("A","E")
+    weight, path := graph1.Dijkstra("A","E")
    
      //Turn our Router to json , this was for testing
 
@@ -178,7 +221,7 @@ func main()  {
     
     fmt.Println("\n\n\n")
     
-    res1B, _ = json.Marshal(prev)
+    res1B, _ = json.Marshal(path)
     fmt.Println(string(res1B))
 
 }
