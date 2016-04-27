@@ -31,15 +31,6 @@ import(
 21
 22      return dist[], prev[]
 
-Now we can read the shortest path from source to target by reverse iteration:
-
-1  S ← empty sequence
-2  u ← target
-3  while prev[u] is defined:                  // Construct the shortest path with a stack S
-4      insert u at the beginning of S         // Push the vertex onto the stack
-5      u ← prev[u]                            // Traverse from target to source
-6  insert u at the beginning of S             // Push the source onto the stack
-
 
 */
 
@@ -76,6 +67,7 @@ func (graph *Graph) Dijkstra(source string, target string)(dist map[string]int,p
       
       
       /*
+Now we can read the shortest path from source to target by reverse iteration:
 1  S ← empty sequence
 2  u ← target
 3  while prev[u] is defined:                  // Construct the shortest path with a stack S
@@ -189,6 +181,26 @@ func (graph *Graph) addNode(idOfNode string) {
     
 }
 
+
+func (graph *Graph) removeNode(idOfNode string){
+    
+ 
+   for key, val := range graph.Nodes{
+       
+       for keyy := range val.Edges{
+           if keyy == idOfNode {
+               delete(graph.Nodes[key].Edges,keyy)
+           }
+       }
+       
+       
+       if(key == idOfNode){
+           delete(graph.Nodes,key)
+       }
+   }
+    
+}
+
 func main()  {
     
     graph1 := createGraph("Fun Graph")
@@ -207,6 +219,7 @@ func main()  {
     graph1.addUndirectedWeightedVertice("C","D",2)
     graph1.addUndirectedWeightedVertice("D","E",9)
    
+    graph1.removeNode("D")
     
     weight, path := graph1.Dijkstra("A","E")
    
