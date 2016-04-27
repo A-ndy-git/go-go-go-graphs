@@ -196,6 +196,7 @@ func (graph *Graph) removeNode(idOfNode string){
        
        if(key == idOfNode){
            delete(graph.Nodes,key)
+           graph.TotalNodes = graph.TotalNodes -1
        }
    }
     
